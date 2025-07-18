@@ -11,7 +11,7 @@ epd.init()
 font_digital = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 54)  # 25% smaller
 font_numbers = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)  # For clock face numbers
 
-center_x, center_y = 600, 240  # Mittelpunkt für analoge Uhr (vertically centered)
+center_x, center_y = 600, 160  # Calculated for balanced 0.8cm spacing
 radius = 130  # 30% larger than original 100
 
 while True:
@@ -42,10 +42,8 @@ while True:
             
             # Display numbers (12, 3, 6, 9)
             number = 12 if hour_mark == 0 else hour_mark
-            # Get text size for centering
-            bbox = draw.textbbox((0, 0), str(number), font=font_numbers)
-            text_width = bbox[2] - bbox[0]
-            text_height = bbox[3] - bbox[1]
+            # Get text size for centering (compatible with older PIL versions)
+            text_width, text_height = draw.textsize(str(number), font=font_numbers)
             draw.text((x_num - text_width//2, y_num - text_height//2), str(number), font=font_numbers, fill=0)
         else:  # Lines for other hour marks
             # Outer point
@@ -57,17 +55,40 @@ while True:
             draw.line((x_inner, y_inner, x_outer, y_outer), fill=0, width=2)
 
     # Digitale Uhrzeit (below analog clock)
-    # Get text size for centering
-    bbox = draw.textbbox((0, 0), time_str, font=font_digital)
-    text_width = bbox[2] - bbox[0]
+    # Get text size for centering (compatible with older PIL versions)
+    text_width, text_height = draw.textsize(time_str, font=font_digital)
     digital_x = center_x - text_width // 2  # Center horizontally with analog clock
-    digital_y = center_y + radius + 30  # Position below analog clock
+    digital_y = center_y + radius + 65  # Increased spacing to redistribute bottom space
+    
+    # Draw rounded border around digital clock (compatible with older PIL)
+    border_padding = 15
+    border_x1 = digital_x - border_padding
+    border_y1 = digital_y - border_padding
+    border_x2 = digital_x + text_width + border_padding
+    border_y2 = digital_y + text_height + border_padding
+    corner_radius = 10
+    
+    # Draw rounded rectangle using lines only (no filled rectangles)
+    # Top and bottom horizontal lines
+    draw.line((border_x1 + corner_radius, border_y1, border_x2 - corner_radius, border_y1), fill=0, width=2)  # Top
+    draw.line((border_x1 + corner_radius, border_y2, border_x2 - corner_radius, border_y2), fill=0, width=2)  # Bottom
+    
+    # Left and right vertical lines
+    draw.line((border_x1, border_y1 + corner_radius, border_x1, border_y2 - corner_radius), fill=0, width=2)  # Left
+    draw.line((border_x2, border_y1 + corner_radius, border_x2, border_y2 - corner_radius), fill=0, width=2)  # Right
+    
+    # Corner arcs
+    draw.arc((border_x1, border_y1, border_x1 + 2*corner_radius, border_y1 + 2*corner_radius), 180, 270, fill=0, width=2)  # Top-left
+    draw.arc((border_x2 - 2*corner_radius, border_y1, border_x2, border_y1 + 2*corner_radius), 270, 360, fill=0, width=2)  # Top-right
+    draw.arc((border_x1, border_y2 - 2*corner_radius, border_x1 + 2*corner_radius, border_y2), 90, 180, fill=0, width=2)   # Bottom-left
+    draw.arc((border_x2 - 2*corner_radius, border_y2 - 2*corner_radius, border_x2, border_y2), 0, 90, fill=0, width=2)     # Bottom-right
+    
     draw.text((digital_x, digital_y), time_str, font=font_digital, fill=0)
 
-    # Minutenzeiger
+    # Minutenzeiger (shortened to not touch the circle)
     angle_min = math.radians(minute / 60 * 360 - 90)
-    x_min = center_x + radius * math.cos(angle_min)
-    y_min = center_y + radius * math.sin(angle_min)
+    x_min = center_x + (radius * 0.85) * math.cos(angle_min)  # Shortened from radius to 0.85 * radius
+    y_min = center_y + (radius * 0.85) * math.sin(angle_min)
     draw.line((center_x, center_y, x_min, y_min), fill=0, width=2)
 
     # Stundenzeiger
