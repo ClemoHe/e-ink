@@ -10,8 +10,8 @@ epd.init()
 
 font_digital = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 72)
 
-center_x, center_y = 600, 200  # Mittelpunkt für analoge Uhr
-radius = 100
+center_x, center_y = 600, 240  # Mittelpunkt für analoge Uhr (vertically centered)
+radius = 130  # 30% larger than original 100
 
 while True:
     now = datetime.now()
