@@ -1,16 +1,19 @@
-# E-Ink Digital Clock Display
 
-A Python-based digital clock application for Waveshare 7.5-inch e-ink displays, designed to run on Raspberry Pi.
+# E-Ink Digital Clock & Weather Display
+
+A Python-based digital and analog clock with weather forecast for Waveshare 7.5-inch e-ink displays, designed for Raspberry Pi.
 
 ## Overview
 
-This project creates a dual-format clock display that shows both digital and analog time on an e-ink screen. The display updates every minute and is perfect for a low-power, always-on desktop clock.
+This project creates a dual-format clock display that shows both digital and analog time, plus a 3-day weather forecast, on an e-ink screen. The display updates every minute and is perfect for a low-power, always-on desktop clock or weather station.
 
 ## Features
 
 - **Digital Clock**: Clear time display in HH:MM format, positioned below the analog clock
-- **Analog Clock**: Traditional clock face with numbered hours (12, 3, 6, 9) and hour mark lines
-- **Professional Design**: Properly centered layout with clock face numbers and hour markings
+- **Analog Clock**: Traditional clock face with selectable hour marks (numbers or lines)
+- **Weather Forecast**: 3-day, 3-times-per-day forecast (morning, noon, evening) from OpenWeatherMap
+- **German Weekday Support**: Weekday names shown in German if locale is available
+- **Configurable via .env**: API key, location, and clock mark style set in `.env` file
 - **Low Power**: Optimized for e-ink displays with minimal power consumption
 - **Auto-refresh**: Updates every 60 seconds
 
@@ -25,13 +28,15 @@ This project creates a dual-format clock display that shows both digital and ana
 - Python 3.x
 - Waveshare e-ink display library (`waveshare_epd`)
 - PIL (Python Imaging Library) / Pillow
-- Standard Python libraries: `math`, `time`, `datetime`, `os`
+- python-dotenv
+- requests
+- Standard Python libraries: `math`, `time`, `datetime`, `os`, `locale`
 
 ## Installation
 
 1. Install the required Python packages:
    ```bash
-   pip install Pillow
+   pip install Pillow python-dotenv requests
    ```
 
 2. Install the Waveshare e-ink display library following their official documentation
@@ -41,23 +46,54 @@ This project creates a dual-format clock display that shows both digital and ana
    sudo apt-get install fonts-dejavu-core
    ```
 
+4. (Optional) Enable German locale for German weekday names:
+   ```bash
+   sudo dpkg-reconfigure locales
+   # Select de_DE.UTF-8 and generate
+   ```
+
 ## Usage
 
-Run the script directly:
-```bash
-python waveshare75_raspbi.py
-```
+1. Copy `.env.example` to `.env` and fill in your OpenWeatherMap API key and location:
+   ```
+   API_KEY=your_openweathermap_api_key
+   LAT=50.2577
+   LON=10.9660
+   CLOCK_MARKS=numbers  # or 'lines'
+   ```
+
+2. Run the script directly:
+   ```bash
+   python waveshare75_raspbi.py
+   ```
 
 The display will show:
-- **Center**: Analog clock face with numbers at 12, 3, 6, 9 o'clock positions and line markers for other hours
+- **Left**: 3-day weather forecast (morning, noon, evening) with German weekday names if locale is set
+- **Right**: Analog clock face (numbers or lines, configurable)
 - **Below analog clock**: Digital time display, centered and sized appropriately
 
 ## Display Layout
 
 - **Screen Resolution**: 800×480 pixels
-- **Analog Clock Center**: (600, 240) - vertically centered
+- **Analog Clock Center**: (600, 160)
 - **Clock Radius**: 130 pixels
 - **Digital Clock**: Centered below analog clock with 54px font
+- **Weather Forecast**: Left half, 3 days, 3 times per day
+## Configuration
+
+All configuration is done via the `.env` file:
+
+- `API_KEY`: Your OpenWeatherMap API key
+- `LAT`, `LON`: Latitude and longitude for weather location
+- `CLOCK_MARKS`: `numbers` for hour numbers, `lines` for tick marks
+
+Example:
+```
+API_KEY=your_openweathermap_api_key
+LAT=50.2577
+LON=10.9660
+CLOCK_MARKS=lines
+```
 - **Clock Face Numbers**: 24px font at 12, 3, 6, 9 positions
 - **Hour Marks**: Lines at remaining hour positions
 - **Background**: White
