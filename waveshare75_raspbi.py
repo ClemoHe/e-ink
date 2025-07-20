@@ -33,13 +33,19 @@ api_key = os.getenv("API_KEY")
 lat = float(os.getenv("LAT"))
 lon = float(os.getenv("LON"))
 
+last_forecast = None
+last_fetch_hour = -1
+
 while True:
     now = datetime.now()
     time_str = now.strftime("%H:%M")
     minute = now.minute
     hour = now.hour % 12
 
-    forecast = get_forecast(api_key, lat, lon)
+    if last_forecast is None or now.hour != last_fetch_hour:
+        last_forecast = get_forecast(api_key, lat, lon)
+        last_fetch_hour = now.hour
+    forecast = last_forecast
 
     Himage = Image.new('1', (epd.width, epd.height), 255)
     draw = ImageDraw.Draw(Himage)
