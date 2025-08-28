@@ -8,8 +8,10 @@ from datetime import datetime, timedelta
 import os
 from waveshare_epd import epd7in5_V2
 from PIL import Image, ImageDraw, ImageFont
+
 from clock import draw_analog_clock, draw_digital_time, font_digital, font_numbers, CENTER_X, CENTER_Y, RADIUS
 from weather import get_forecast
+from pihole import get_pihole_stats, draw_pihole_stats
 
 epd = epd7in5_V2.EPD()
 epd.init()
@@ -18,6 +20,9 @@ epd.init()
 
 # Weather forecast font (original size)
 font_weather = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
+
+# Font for Pi-hole stats
+font_pihole = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 22)
 
 locale.setlocale(locale.LC_TIME, 'de_DE.UTF-8')
 
@@ -78,6 +83,14 @@ while True:
 
     # Draw digital time (below analog clock)
     draw_digital_time(draw, CENTER_X, CENTER_Y, RADIUS, time_str, font_digital)
+
+    # Draw Pi-hole stats (bottom left, rectangle)
+    pihole_x = 20
+    pihole_y = epd.height - 100
+    pihole_width = 260
+    pihole_height = 80
+    stats = get_pihole_stats()
+    draw_pihole_stats(draw, pihole_x, pihole_y, pihole_width, pihole_height, stats, font_pihole)
 
     epd.display(epd.getbuffer(Himage))
     time.sleep(60)

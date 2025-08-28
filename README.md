@@ -54,18 +54,83 @@ This project creates a dual-format clock display that shows both digital and ana
 
 ## Usage
 
-1. Copy `.env.example` to `.env` and fill in your OpenWeatherMap API key and location:
+
+1. Copy `.env.example` to `.env` and fill in all required values:
+
    ```
+   # Weather/Clock
    API_KEY=your_openweathermap_api_key
    LAT=50.2577
    LON=10.9660
    CLOCK_MARKS=numbers  # or 'lines'
+
+   # Pi-hole v6
+   PIHOLE_URL=http://192.168.178.99
+   PIHOLE_PASSWORD=your_pihole_web_password
    ```
+
 
 2. Run the script directly:
    ```bash
    python waveshare75_raspbi.py
    ```
+
+
+## Pi-hole v6 Integration
+
+This project supports Pi-hole v6 and uses the new API endpoints and authentication flow:
+
+- The API is at `/api/` (not `/admin/api.php` or `/api.php`)
+- Stats are fetched from `/api/stats/summary` (fields: `queries.total`, `queries.blocked`, `queries.percent_blocked`, `domains_blocked`)
+- Blocking status is fetched from `/api/dns/blocking` (field: `enabled`)
+- Authentication is required: a session ID (SID) is obtained via `POST /api/auth` with your Pi-hole web password, and sent as header `X-FTL-SID` for all API requests
+
+
+All configuration is done via the `.env` file. Replace the example values as needed for your setup.
+
+### Troubleshooting
+
+- If you see only dashes or errors for Pi-hole stats, check your `.env` values and Pi-hole version.
+- The code is compatible with Pi-hole v6+ only (not v5 or earlier).
+
+---
+## Running in the Background & Managing the Process
+
+To run the script in the background (so it keeps running after you log out or close the terminal), use:
+
+```bash
+nohup python3 waveshare75_raspbi.py &
+```
+
+To find the process later, use:
+
+```bash
+ps aux | grep waveshare75_raspbi.py
+```
+
+
+If the `ps aux | grep waveshare75_raspbi.py` command only shows one line, like:
+
+```
+pi        3503  0.0  0.0   7676   520 pts/0    S+   19:28   0:00 grep --color=auto waveshare75_raspbi.py
+```
+then your script is not running—the only line shown is the `grep` command itself.
+
+If you see output like this:
+
+```
+pi        3685  8.2  0.9  31816 18776 pts/0    S    19:30   0:05 python3 waveshare75_raspbi.py
+pi        3769  0.0  0.0   7676   496 pts/0    S+   19:31   0:00 grep --color=auto waveshare75_raspbi.py
+```
+the first line (with `python3 waveshare75_raspbi.py`) shows your actual running script, and the number in the second column (here, `3685`) is the PID you should use with `kill`.
+
+To stop (kill) the process, use:
+
+```bash
+kill <PID>
+```
+
+Replace `<PID>` with the actual number shown in the output of the previous command.
 
 The display will show:
 - **Left**: 3-day weather forecast (morning, noon, evening) with German weekday names if locale is set
