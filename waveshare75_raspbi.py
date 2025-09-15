@@ -72,11 +72,11 @@ while True:
 
     for label, forecast_key in labels:
         draw.text((left_x, y), f"{label}:", font=font_title, fill=0)
-        y += 32
+        y += 24  # Reduced gap after day label
         for part in ["Morning", "Noon", "Evening"]:
             draw.text((left_x + 10, y), f"{part}: {forecast[forecast_key][part]}", font=font_weather, fill=0)
             y += 28
-        y += 10
+        y += 8  # Reduced gap between blocks
 
     # Draw analog clock (right)
     draw_analog_clock(draw, CENTER_X, CENTER_Y, RADIUS, hour, minute, font_numbers, clock_marks)
@@ -87,8 +87,8 @@ while True:
     # Draw Pi-hole stats (bottom left, rectangle)
     pihole_x = 20
     pihole_y = epd.height - 100
-    pihole_width = 260
-    pihole_height = 80
+    pihole_width = 380  # Added 60 pixels (320 + 60)
+    pihole_height = 85  # Increased height by 5 pixels
     stats = get_pihole_stats()
     draw_pihole_stats(draw, pihole_x, pihole_y, pihole_width, pihole_height, stats, font_pihole)
 

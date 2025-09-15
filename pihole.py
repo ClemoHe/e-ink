@@ -103,22 +103,22 @@ def draw_pihole_stats(draw: ImageDraw.Draw, x, y, width, height, stats, font):
     draw.rectangle([x, y, x+width, y+height], outline=0, width=2)
     # Left column: Q, Blk, %Blk
     left_labels = [
-        ("Q", stats["queries_today"]),
-        ("Blk", stats["ads_blocked_today"]),
-        ("%Blk", stats["ads_percentage_today"])
+        ("Queries today", stats["queries_today"]),
+        ("Blocked today", stats["ads_blocked_today"]),
+        ("Percent blocked today", stats["ads_percentage_today"])
     ]
     # Right column: Dom, Sts
     right_labels = [
-        ("Dom", stats["domains_blocked"]),
-        ("Sts", stats["status"])
+        ("Domains blocked", stats["domains_blocked"]),
+        ("Status", stats["status"])
     ]
     label_y = y + 8
     for i, (label, value) in enumerate(left_labels):
         draw.text((x+10, label_y), f"{label}: {value}", font=font, fill=0)
         label_y += font.size + 2
-    # Place Dom and Sts to the right, aligned with first and second row
-    right_x = x + width // 2 + 5
-    right_y1 = y + 8
-    right_y2 = right_y1 + font.size + 2
-    draw.text((right_x, right_y1), f"Dom: {stats['domains_blocked']}", font=font, fill=0)
-    draw.text((right_x, right_y2), f"Sts: {stats['status']}", font=font, fill=0)
+    # Place right labels using the same pattern as left labels
+    right_x = x + width // 2 + 45  # Moved 40 pixels to the right (5 + 40)
+    right_y = y + 8
+    for i, (label, value) in enumerate(right_labels):
+        draw.text((right_x, right_y), f"{label}: {value}", font=font, fill=0)
+        right_y += font.size + 2
